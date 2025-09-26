@@ -14,13 +14,13 @@ import com.example.shopinglist.components.ItemInput
 import com.example.shopinglist.components.SearchInput
 import com.example.shopinglist.components.ShoppingList
 import com.example.shopinglist.components.Title
-import com.example.shopinglist.ui.theme.ShopingListTheme
+import com.example.shopinglist.ui.theme.ShoppingListTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ShopingListTheme {
+            ShoppingListTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -36,7 +36,12 @@ class MainActivity : ComponentActivity() {
 fun ShoppingListApp() {
     var newItemText by rememberSaveable { mutableStateOf("") }
     var searchQuery by rememberSaveable { mutableStateOf("") }
-    val shoppingItems = remember { mutableStateListOf<String>() }
+    val shoppingItems = remember { mutableStateListOf<String>("Susu Segar",
+        "Roti Tawar",
+        "Telur Ayam",
+        "Apel Fuji",
+        "Daging Sapi")
+    }
 
     val filteredItems by remember(searchQuery, shoppingItems) {
         derivedStateOf {
@@ -79,7 +84,7 @@ fun ShoppingListApp() {
 @Preview(showBackground = true)
 @Composable
 fun ShoppingListAppPreview() {
-    ShopingListTheme {
+    ShoppingListTheme {
         ShoppingListApp()
     }
 }
