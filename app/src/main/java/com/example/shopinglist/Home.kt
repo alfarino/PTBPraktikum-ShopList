@@ -26,18 +26,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.shopinglist.ui.theme.ShoppingListTheme
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    shoppingItems: MutableList<String>,
+    onItemClick: (String) -> Unit = {}
+) {
     var newItemText by rememberSaveable { mutableStateOf("") }
     var searchQuery by rememberSaveable { mutableStateOf("") }
-    val shoppingItems = remember {
-        mutableStateListOf(
-            "Susu Segar",
-            "Roti Tawar",
-            "Telur Ayam",
-            "Apel Fuji",
-            "Daging Sapi"
-        )
-    }
 
     val filteredItems by remember(searchQuery, shoppingItems) {
         derivedStateOf {
@@ -72,7 +67,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             onQueryChange = { searchQuery = it }
         )
         Spacer(modifier = Modifier.height(16.dp))
-        ShoppingList(items = filteredItems)
+        ShoppingList(items = filteredItems, onItemClick = onItemClick)
     }
 }
 
@@ -80,6 +75,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 @Composable
 fun HomeScreenPreview() {
     ShoppingListTheme {
-        HomeScreen()
+        val sample = remember { mutableStateListOf("Susu Segar", "Roti Tawar", "Telur Ayam") }
+        HomeScreen(shoppingItems = sample, onItemClick = {})
     }
 }

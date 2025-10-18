@@ -1,4 +1,16 @@
 <resources>
     <string name="app_name">Shoping List</string>
     <string name="search_items">Search items</string>
+    <string name="kembali">Kembali</string>
+    <!-- Profile strings -->
+    <string name="profile_title_greeting">Halo!</string>
+    <string name="profile_description">Saya mahasiswa yang tertarik untuk mengembangkan aplikasi mobile yang membantu aktivitas harian.</string>
+    <string name="profile_photo_desc">Foto pribadi</string>
+    <string name="profile_closing">Senang bisa mengenalmu!</string>
+    <string name="profile_label_name">Nama</string>
+    <string name="profile_label_nim">NIM</string>
+    <string name="profile_label_hobby">Hobi</string>
+    <string name="profile_label_dob">Tempat, Tanggal Lahir</string>
+    <string name="profile_label_major">Peminatan</string>
+    <string name="kembali2">Kembali</string>
 </resources>

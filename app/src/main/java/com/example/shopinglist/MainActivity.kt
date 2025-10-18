@@ -4,12 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.with
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -30,6 +32,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -40,40 +43,34 @@ import com.example.shopinglist.components.BottomNavigationBar
 import com.example.shopinglist.ui.theme.ShoppingListTheme
 import kotlinx.coroutines.launch
 
-sealed class Screen(val route: String, val title: String) {
-    data object Home : Screen("home", "Home")
-    data object Profile : Screen("profile", "Profile")
-    data object Setting : Screen("setting", "Setting")
-}
-
-data class BottomNavItem(
-    val screen: Screen,
-    val icon: androidx.compose.ui.graphics.vector.ImageVector,
-    val label: String
-)
-
-private val bottomNavItems = listOf(
-    BottomNavItem(Screen.Home, Icons.Filled.Home, "Home"),
-    BottomNavItem(Screen.Profile, Icons.Filled.Person, "Profile")
-)
+// Navigation types (Screen, BottomNavItem, bottomNavItems) moved to Navigation.kt
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ShoppingListTheme {
-                MainApp()
+                MainAppContent()
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun MainApp() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
     var currentRoute by rememberSaveable { mutableStateOf(Screen.Home.route) }
+    var currentDetailItem by rememberSaveable { mutableStateOf<String?>(null) }
+    val snackbarHostState = androidx.compose.material3.SnackbarHostState()
+    val shoppingItems = remember { androidx.compose.runtime.mutableStateListOf(
+        "Susu Segar",
+        "Roti Tawar",
+        "Telur Ayam",
+        "Apel Fuji",
+        "Daging Sapi"
+    ) }
 
     val currentScreen = when (currentRoute) {
         Screen.Profile.route -> Screen.Profile
@@ -120,6 +117,18 @@ fun MainApp() {
                     }
                 )
             },
+            floatingActionButton = {
+                androidx.compose.material3.FloatingActionButton(onClick = {
+                    val newItem = "Item ${shoppingItems.size + 1}"
+                    shoppingItems.add(newItem)
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Menambahkan: $newItem")
+                    }
+                }) {
+                    androidx.compose.material3.Icon(imageVector = Icons.Filled.Add, contentDescription = "Tambah")
+                }
+            },
+            snackbarHost = { androidx.compose.material3.SnackbarHost(hostState = snackbarHostState) },
             bottomBar = {
                 BottomNavigationBar(
                     items = bottomNavItems,
@@ -135,49 +144,31 @@ fun MainApp() {
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                AnimatedContent(
-                    targetState = currentRoute,
-                    transitionSpec = {
-                        // determine navigation direction by comparing route indices
-                        val order = listOf(Screen.Home.route, Screen.Profile.route, Screen.Setting.route)
-                        val initialIndex = order.indexOf(initialState)
-                        val targetIndex = order.indexOf(targetState)
-                        val forward = targetIndex > initialIndex
-
-                        // explicit offsets: when moving forward new screen comes from right and old exits to left
-                        // when moving backward new screen comes from left and old exits to right
-                        val enter = if (forward) {
-                            fadeIn(animationSpec = tween(300)) + slideInHorizontally(
-                                animationSpec = tween(300),
-                                initialOffsetX = { fullWidth -> fullWidth / 4 }
-                            )
-                        } else {
-                            fadeIn(animationSpec = tween(300)) + slideInHorizontally(
-                                animationSpec = tween(300),
-                                initialOffsetX = { fullWidth -> -fullWidth / 4 }
-                            )
-                        }
-
-                        val exit = if (forward) {
-                            fadeOut(animationSpec = tween(300)) + slideOutHorizontally(
-                                animationSpec = tween(300),
-                                targetOffsetX = { fullWidth -> -fullWidth / 4 }
-                            )
-                        } else {
-                            fadeOut(animationSpec = tween(300)) + slideOutHorizontally(
-                                animationSpec = tween(300),
-                                targetOffsetX = { fullWidth -> fullWidth / 4 }
-                            )
-                        }
-
-                        enter.togetherWith(exit)
-                    },
-                    label = "screen_transition"
-                ) { route ->
+                AnimatedContent(targetState = currentRoute, transitionSpec = {
+                    if (initialState == Screen.Home.route && targetState == "detail") {
+                        slideInHorizontally(animationSpec = tween(300)) { full -> full } + fadeIn() with
+                                slideOutHorizontally(animationSpec = tween(300)) { full -> -full } + fadeOut()
+                    } else if (initialState == "detail" && targetState == Screen.Home.route) {
+                        slideInHorizontally(animationSpec = tween(300)) { full -> -full } + fadeIn() with
+                                slideOutHorizontally(animationSpec = tween(300)) { full -> full } + fadeOut()
+                    } else {
+                        fadeIn(animationSpec = tween(200)) with fadeOut(animationSpec = tween(200))
+                    }
+                }) { route ->
                     when (route) {
                         Screen.Profile.route -> ProfileScreen()
                         Screen.Setting.route -> SettingScreen()
-                        else -> HomeScreen()
+                        "detail" -> {
+                            val item = currentDetailItem ?: ""
+                            DetailScreen(item = item, onBack = {
+                                currentDetailItem = null
+                                currentRoute = Screen.Home.route
+                            })
+                        }
+                        else -> HomeScreen(shoppingItems = shoppingItems, onItemClick = { item ->
+                            currentDetailItem = item
+                            currentRoute = "detail"
+                        })
                     }
                 }
             }

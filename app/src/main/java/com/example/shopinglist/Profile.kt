@@ -19,8 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import androidx.compose.ui.res.painterResource
-import androidx.compose.foundation.Image
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.background
@@ -34,11 +35,11 @@ private data class ProfileInfo(
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier) {
 	val profileItems = listOf(
-		ProfileInfo("Nama", "Alfa Rino Svedrilio"),
-		ProfileInfo("NIM", "2311522005"),
-		ProfileInfo("Hobi", "Membaca"),
-		ProfileInfo("Tempat, Tanggal Lahir", "Payakumbuh, 13 Agustus 2005"),
-		ProfileInfo("Peminatan", "Mobile Programming")
+		ProfileInfo(stringResource(id = R.string.profile_label_name), "Alfa Rino Svedrilio"),
+		ProfileInfo(stringResource(id = R.string.profile_label_nim), "2311522005"),
+		ProfileInfo(stringResource(id = R.string.profile_label_hobby), "Membaca"),
+		ProfileInfo(stringResource(id = R.string.profile_label_dob), "Payakumbuh, 13 Agustus 2005"),
+		ProfileInfo(stringResource(id = R.string.profile_label_major), "Mobile Programming")
 	)
 
 	LazyColumn(
@@ -62,9 +63,9 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
 					horizontalAlignment = Alignment.CenterHorizontally,
 					verticalArrangement = Arrangement.spacedBy(12.dp)
 				) {
-					Image(
-						painter = painterResource(id = R.drawable.profile_picture),
-						contentDescription = "Foto pribadi",
+					AsyncImage(
+						model = R.drawable.profile_picture,
+						contentDescription = stringResource(id = R.string.profile_photo_desc),
 						modifier = Modifier
 							.fillMaxWidth()
 							.height(180.dp)
@@ -72,12 +73,12 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
 						contentScale = ContentScale.Crop
 					)
 					Text(
-						text = "Halo!",
+						text = stringResource(id = R.string.profile_title_greeting),
 						style = MaterialTheme.typography.headlineSmall,
 						fontWeight = FontWeight.Bold
 					)
 					Text(
-						text = "Saya mahasiswa yang tertarik untuk mengembangkan aplikasi mobile yang membantu aktivitas harian.",
+						text = stringResource(id = R.string.profile_description),
 						style = MaterialTheme.typography.bodyMedium,
 						color = MaterialTheme.colorScheme.onPrimaryContainer
 					)
@@ -111,7 +112,7 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
 			HorizontalDivider()
 			Spacer(modifier = Modifier.height(8.dp))
 			Text(
-				text = "Senang bisa mengenalmu!",
+				text = stringResource(id = R.string.profile_closing),
 				style = MaterialTheme.typography.bodyMedium,
 				color = MaterialTheme.colorScheme.onSurfaceVariant
 			)
