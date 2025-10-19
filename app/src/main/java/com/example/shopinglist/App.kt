@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -47,13 +48,9 @@ fun MainAppContent() {
     var currentRoute by rememberSaveable { mutableStateOf(Screen.Home.route) }
     var currentDetailItem by rememberSaveable { mutableStateOf<String?>(null) }
     val snackbarHostState = androidx.compose.material3.SnackbarHostState()
-    val shoppingItems = remember { androidx.compose.runtime.mutableStateListOf(
-        "Susu Segar",
-        "Roti Tawar",
-        "Telur Ayam",
-        "Apel Fuji",
-        "Daging Sapi"
-    ) }
+    // use ViewModel to hold app data
+    val vm: MainViewModel = viewModel()
+    val shoppingItems = vm.shoppingItems
 
     val currentScreen = when (currentRoute) {
         Screen.Profile.route -> Screen.Profile
@@ -102,8 +99,8 @@ fun MainAppContent() {
             },
             floatingActionButton = {
                 androidx.compose.material3.FloatingActionButton(onClick = {
-                    val newItem = "Item ${shoppingItems.size + 1}"
-                    shoppingItems.add(newItem)
+                    // delegate creation to ViewModel
+                    val newItem = vm.addNewItem()
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar("Menambahkan: $newItem")
                     }

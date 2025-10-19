@@ -6,8 +6,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,13 +28,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopinglist.ui.theme.ShoppingListTheme
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ShoppingList(items: List<String>, onItemClick: (String) -> Unit = {}) {
     LazyColumn(
@@ -88,18 +84,19 @@ fun ShoppingListItem(item: String, onCardClick: () -> Unit = {}, modifier: Modif
         ) {
             val avatarColor by animateColorAsState(targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer, animationSpec = tween(200))
 
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .shadow(2.dp, shape = RoundedCornerShape(50))
-                    .background(color = avatarColor, shape = RoundedCornerShape(50)),
-                contentAlignment = Alignment.Center
+            Card(
+                modifier = Modifier.size(40.dp),
+                shape = RoundedCornerShape(50),
+                colors = CardDefaults.cardColors(containerColor = avatarColor),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                Text(
-                    text = item.firstOrNull()?.uppercase() ?: "?",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondaryContainer
-                )
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = item.firstOrNull()?.uppercase() ?: "?",
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
             }
 
             Text(

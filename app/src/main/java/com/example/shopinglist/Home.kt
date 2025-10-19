@@ -2,15 +2,11 @@ package com.example.shopinglist
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -22,8 +18,6 @@ import com.example.shopinglist.components.ItemInput
 import com.example.shopinglist.components.SearchInput
 import com.example.shopinglist.components.ShoppingList
 import com.example.shopinglist.components.Title
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.shopinglist.ui.theme.ShoppingListTheme
 
 @Composable
 fun HomeScreen(
@@ -47,7 +41,6 @@ fun HomeScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(WindowInsets.systemBars.asPaddingValues())
             .padding(horizontal = 16.dp)
     ) {
         Title()
@@ -68,14 +61,5 @@ fun HomeScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
         ShoppingList(items = filteredItems, onItemClick = onItemClick)
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    ShoppingListTheme {
-        val sample = remember { mutableStateListOf("Susu Segar", "Roti Tawar", "Telur Ayam") }
-        HomeScreen(shoppingItems = sample, onItemClick = {})
     }
 }
